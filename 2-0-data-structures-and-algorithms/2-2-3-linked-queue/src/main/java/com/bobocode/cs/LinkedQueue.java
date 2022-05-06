@@ -13,13 +13,34 @@ import com.bobocode.util.ExerciseNotCompletedException;
  */
 public class LinkedQueue<T> implements Queue<T> {
 
+    private static class Node<T> {
+        T value;
+        Node<T> next;
+
+        private Node(T value) {
+            this.value = value;
+        }
+    }
+
+    private Node<T> head;
+    private Node<T> tail;
+    private int size;
+
     /**
      * Adds an element to the end of the queue.
      *
      * @param element the element to add
      */
     public void add(T element) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        Node<T> addedNode = new Node<>(element);
+        if (isEmpty()) {
+            head = addedNode;
+            tail = addedNode;
+        } else {
+            tail.next = addedNode;
+            tail = addedNode;
+        }
+        size++;
     }
 
     /**
@@ -28,7 +49,16 @@ public class LinkedQueue<T> implements Queue<T> {
      * @return an element that was retrieved from the head or null if queue is empty
      */
     public T poll() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        T polledValue = null;
+        if (!isEmpty()) {
+            polledValue = head.value;
+            head = head.next;
+            size--;
+            if (head == null) {
+                tail = null;
+            }
+        }
+        return polledValue;
     }
 
     /**
@@ -37,7 +67,7 @@ public class LinkedQueue<T> implements Queue<T> {
      * @return an integer value that is a size of queue
      */
     public int size() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        return size;
     }
 
     /**
@@ -46,6 +76,6 @@ public class LinkedQueue<T> implements Queue<T> {
      * @return {@code true} if the queue is empty, returns {@code false} if it's not
      */
     public boolean isEmpty() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        return this.size == 0;
     }
 }

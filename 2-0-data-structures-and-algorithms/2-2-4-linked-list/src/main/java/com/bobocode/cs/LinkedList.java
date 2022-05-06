@@ -1,6 +1,9 @@
 package com.bobocode.cs;
 
 
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
 import com.bobocode.util.ExerciseNotCompletedException;
 
 /**
@@ -13,6 +16,23 @@ import com.bobocode.util.ExerciseNotCompletedException;
  */
 public class LinkedList<T> implements List<T> {
 
+    static class Node<T> {
+        private T value;
+        private Node<T> next;
+
+        private Node(T value) {
+            this.value = value;
+        }
+
+        public static <T> Node<T> valueOf(T value) {
+            return new Node<>(value);
+        }
+    }
+
+    private Node<T> head;
+    private Node<T> tail;
+    private int size;
+
     /**
      * This method creates a list of provided elements
      *
@@ -21,7 +41,9 @@ public class LinkedList<T> implements List<T> {
      * @return a new list of elements the were passed as method parameters
      */
     public static <T> LinkedList<T> of(T... elements) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        LinkedList<T> createdList = new LinkedList<>();
+        Arrays.stream(elements).forEach(createdList::add);
+        return createdList;
     }
 
     /**
@@ -31,7 +53,15 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public void add(T element) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        Node<T> addedNode = new Node<>(element);
+        if (isEmpty()) {
+            head = addedNode;
+            tail = addedNode;
+        } else {
+            tail.next = addedNode;
+            tail = addedNode;
+        }
+        size++;
     }
 
     /**
@@ -43,7 +73,17 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public void add(int index, T element) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        Node<T> currentNode = Node.valueOf(element);
+        Node<T> nodeBeforeIndex = null;
+        if (index == 0) {
+            currentNode.next = head;
+            head = currentNode;
+        } else {
+            nodeBeforeIndex = getNodeByIndex(index - 1);
+            currentNode.next = nodeBeforeIndex.next;
+            nodeBeforeIndex.next = currentNode;
+        }
+        size++;
     }
 
     /**
@@ -55,7 +95,7 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public void set(int index, T element) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        getNodeByIndex(index).value = element;
     }
 
     /**
@@ -67,7 +107,7 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public T get(int index) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        return getNodeByIndex(index).value;
     }
 
     /**
@@ -78,7 +118,8 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public T getFirst() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        checkElementsExist();
+        return getNodeByIndex(0).value;
     }
 
     /**
@@ -89,7 +130,8 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public T getLast() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        checkElementsExist();
+        return getNodeByIndex(size-1).value;
     }
 
     /**
@@ -101,7 +143,26 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public T remove(int index) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        if (isEmpty()) {
+           throw new IndexOutOfBoundsException();
+        }
+        Node<T> nodeBeforeIndex = null;
+        T deletedElement = null;
+        if (index == 0) {
+            deletedElement = head.value;
+            head = head.next;
+        } else {
+            nodeBeforeIndex = getNodeByIndex(index - 1);
+            deletedElement = nodeBeforeIndex.next.value;
+            if (index == size - 1) {
+                nodeBeforeIndex.next = null;
+                tail = nodeBeforeIndex;
+            } else {
+                nodeBeforeIndex.next = nodeBeforeIndex.next.next;
+            }
+        }
+        size--;
+        return deletedElement;
     }
 
 
@@ -112,7 +173,16 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public boolean contains(T element) {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        if (isEmpty()) {
+            return false;
+        }
+        Node<T> currentNode = head;
+        boolean isContains = head.value.equals(element);
+        for (int i = 1; i < size - 1; i++) {
+            currentNode = currentNode.next;
+            isContains = currentNode.value.equals(element);
+        }
+        return isContains;
     }
 
     /**
@@ -122,7 +192,7 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public boolean isEmpty() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        return head == null;
     }
 
     /**
@@ -132,7 +202,7 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public int size() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        return size;
     }
 
     /**
@@ -140,6 +210,28 @@ public class LinkedList<T> implements List<T> {
      */
     @Override
     public void clear() {
-        throw new ExerciseNotCompletedException(); // todo: implement this method
+        head = tail = null;
+        size = 0;
+    }
+
+    private void indexCheck(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    private void checkElementsExist() {
+        if (head  == null) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    private Node<T> getNodeByIndex (int index) {
+        indexCheck(index);
+        Node<T> currentNode = head;
+        for (int i = 1; i <= index; i++) {
+            currentNode = currentNode.next;
+        }
+        return currentNode;
     }
 }
